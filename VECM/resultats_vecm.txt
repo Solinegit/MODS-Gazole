@@ -1,0 +1,83 @@
+RÉSULTATS DU VECM — Prix du gazole et du Brent en France
+Période : 2007-01 → 2026-04  (232 observations mensuelles)
+Modèle  : VECM(k=1)  |  Rang de cointégration r=1
+
+=================================================================
+  1. PARAMÈTRES DU MODÈLE
+=================================================================
+  Nombre de lags retenus (AIC) : 1
+  Rang de cointégration        : 1
+  ⚠ Le test de Johansen suggère r=0 (pas de cointégration
+    statistiquement détectée). r=1 est forcé sur la base
+    de l'hypothèse économique : le Brent détermine le gazole
+    à long terme (ruptures 2008/2020/2022 peuvent biaiser le test).
+
+=================================================================
+  2. RELATION D'ÉQUILIBRE DE LONG TERME (vecteur bêta)
+=================================================================
+
+  Équation normalisée (coefficient gazole = 1) :
+    gazole_ttc = 2.3209 × brent_eur_l + constante de tendance
+
+  Interprétation :
+    → Une hausse de 0.10 €/L du Brent est associée à une hausse
+      de 0.2321 €/L du gazole à long terme.
+    → Ce coefficient reflète la transmission structurelle du coût
+      du brut dans le prix final TTC (raffinage + distribution + taxes).
+
+=================================================================
+  3. VITESSE D'AJUSTEMENT (coefficient alpha)
+=================================================================
+  alpha (gazole) = 0.0108
+  alpha (Brent)  = 0.0400
+
+  ⚠ Alpha positif : pas de force de rappel détectée sur le gazole.
+
+=================================================================
+  4. DYNAMIQUE DE COURT TERME (coefficients Gamma)
+=================================================================
+
+--- Équation du gazole ---
+  const            = 0.0037
+  L1.gazole_ttc    = -0.2526
+  L1.brent_eur_l   = 0.9744
+
+  → Une hausse de 0.10 €/L du Brent le mois précédent
+    entraîne une variation de +0.0974 €/L du gazole le mois suivant.
+
+=================================================================
+  5. PRÉVISIONS SUR 12 MOIS (à partir de 2026-05)
+=================================================================
+
+  Mois           Gazole TTC (€/L)    Brent (€/L)
+  ------------ ------------------ --------------
+  2026-05                  2.2494         0.6295
+  2026-06                  2.2515         0.6301
+  2026-07                  2.2569         0.6326
+  2026-08                  2.2634         0.6355
+  2026-09                  2.2698         0.6382
+  2026-10                  2.2762         0.6408
+  2026-11                  2.2824         0.6433
+  2026-12                  2.2884         0.6456
+  2027-01                  2.2943         0.6477
+  2027-02                  2.3001         0.6498
+  2027-03                  2.3058         0.6517
+  2027-04                  2.3114         0.6536
+
+  Gazole en 2027-04 : 2.3114 €/L
+  Variation prévue vs avril 2026 : +0.0725 €/L (+3.2%)
+
+=================================================================
+  6. LIMITES ET MISE EN GARDE
+=================================================================
+
+  • Ces prévisions supposent que le Brent reste proche de son
+    niveau actuel. Tout choc géopolitique (Moyen-Orient, Russie)
+    ou macroéconomique (récession, dollar fort) les invaliderait.
+
+  • La fiscalité (TICPE) n'est pas modélisée ici. Une réforme
+    fiscale constituerait un levier immédiat sur le prix final.
+
+  • Le VECM ne capture pas les asymétries : la littérature montre
+    que les hausses du Brent se transmettent plus vite que les baisses
+    ('rocket and feather effect', Bacon 1991).
