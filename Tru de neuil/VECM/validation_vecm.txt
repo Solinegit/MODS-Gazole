@@ -1,0 +1,27 @@
+VALIDATION DU VECM — Synthèse des 3 tests essentiels
+============================================================
+
+1. TEST DE NORMALITÉ DES RÉSIDUS (Jarque-Bera)
+   H0 : les résidus suivent une loi normale
+   Gazole  : stat=160.842, p=0.0000 → ✗ On rejette H0 (non normale)
+             asymétrie=1.286, excès de kurtosis=5.725
+   Brent   : stat=60.326, p=0.0000 → ✗ On rejette H0 (non normale)
+             asymétrie=0.494, excès de kurtosis=3.715
+   → Résidus non normaux : fréquent sur des séries de prix avec
+     ruptures structurelles (2008, 2020, 2022). Les intervalles
+     de confiance des prévisions sont à interpréter avec prudence.
+
+2. TEST DE BLANCHEUR DES RÉSIDUS (Ljung-Box, 12 lags)
+   H0 : les résidus ne sont pas autocorrélés
+   Gazole  : Q=14.182, p=0.2892 → ✓ Résidus blancs
+   Brent   : Q=4.248, p=0.9785 → ✓ Résidus blancs
+
+3. TEST DE STABILITÉ (racines de la matrice companion)
+   H0 : toutes les valeurs propres sont dans le cercle unité
+   Modules des valeurs propres : ['1.0000', '0.8107', '0.2286', '0.2286']
+   → ✓ Modèle stable : les prévisions convergent
+
+============================================================
+CONCLUSION GLOBALE
+  3/5 critères validés.
+  → Résultats acceptables mais à nuancer dans le rapport.
