@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 # Coefficients VECM symétrique (Annexe 4) — vitesse de convergence vers nouvel équilibre
 ALPHA_BRENT_HT  = 0.0604   # demi-vie 11,1 semaines
 ALPHA_BRENT_TTC = 0.0318   # demi-vie 21,4 semaines
+ALPHA_BRENT_DESCENT = np.log(2) / 20  # demi-vie 20 semaines (~5 mois) — tiré de l'auto-IRF du Brent
+
 
 # Élasticités de long terme (Annexe 3 / Johansen)
 ELAS_HT  = 0.885
@@ -62,24 +64,27 @@ def simuler_trajectoire(choc_pct, n_semaines=N_SEMAINES):
     gaz_ht[0]  = PRIX_GAZOLE_HT_INIT
     gaz_ttc[0] = PRIX_GAZOLE_TTC_INIT
 
-    # Cibles d'équilibre de long terme via élasticité
-    ratio = brent_cible / brent_init
-    gaz_ht_cible  = max(PRIX_GAZOLE_HT_INIT  * (ratio ** ELAS_HT),  PLANCHER_HT)
-    gaz_ttc_cible = max(PRIX_GAZOLE_TTC_INIT * (ratio ** ELAS_TTC), PLANCHER_TTC)
+    # Cibles finales (pour les annotations)
+    ratio_final   = brent_cible / brent_init
+    gaz_ht_cible  = max(PRIX_GAZOLE_HT_INIT  * (ratio_final ** ELAS_HT),  PLANCHER_HT)
+    gaz_ttc_cible = max(PRIX_GAZOLE_TTC_INIT * (ratio_final ** ELAS_TTC), PLANCHER_TTC)
 
     for t in range(n_semaines - 1):
-        # Brent converge exponentiellement vers sa nouvelle cible (VECM HT)
-        brent[t+1] = brent_cible + (brent[t] - brent_cible) * (1 - ALPHA_BRENT_HT)
+        # Brent descend progressivement (demi-vie 20 sem. — IRF)
+        brent[t+1] = brent_cible + (brent[t] - brent_cible) * (1 - ALPHA_BRENT_DESCENT)
 
-        # Gazole HT suit avec inertie propre (même vitesse que Brent HT)
+        # Cible instantanée du gazole = fonction du Brent courant
+        ratio_t = brent[t+1] / brent_init
+        gaz_ht_cible_t  = max(PRIX_GAZOLE_HT_INIT  * (ratio_t ** ELAS_HT),  PLANCHER_HT)
+        gaz_ttc_cible_t = max(PRIX_GAZOLE_TTC_INIT * (ratio_t ** ELAS_TTC), PLANCHER_TTC)
+
+        # Le gazole converge vers cette cible mouvante
         gaz_ht[t+1] = max(
-            gaz_ht_cible + (gaz_ht[t] - gaz_ht_cible) * (1 - ALPHA_BRENT_HT),
+            gaz_ht_cible_t  + (gaz_ht[t]  - gaz_ht_cible_t)  * (1 - ALPHA_BRENT_HT),
             PLANCHER_HT
         )
-
-        # Gazole TTC plus lent à cause du filtre fiscal (VECM TTC)
         gaz_ttc[t+1] = max(
-            gaz_ttc_cible + (gaz_ttc[t] - gaz_ttc_cible) * (1 - ALPHA_BRENT_TTC),
+            gaz_ttc_cible_t + (gaz_ttc[t] - gaz_ttc_cible_t) * (1 - ALPHA_BRENT_TTC),
             PLANCHER_TTC
         )
 
@@ -231,8 +236,9 @@ for sc in SCENARIOS:
         fontsize=13, fontweight="bold", pad=12, color="#2c3e50"
     )
     fig.text(0.5, 0.01,
-             "Méthode : VECM symétrique (demi-vie Brent HT = 11,1 sem., TTC = 21,4 sem.) — Coefficients estimés sur données hebdomadaires 2005–2026",
-             ha="center", fontsize=8, color="#7f8c8d", style="italic")
+            "Méthode : VECM symétrique + descente progressive du Brent (IRF, demi-vie 20 sem.) "
+            "— Coefficients estimés sur données hebdomadaires 2005–2026",
+            ha="center", fontsize=8, color="#7f8c8d", style="italic")
 
     plt.tight_layout(rect=[0, 0.03, 1, 1])
 
